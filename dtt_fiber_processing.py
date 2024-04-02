@@ -58,8 +58,28 @@ def strip_sides(value):
     if pd.isna(value):
         return 'Total_Brain'
     else:
-        return value.split(" ")[1] # Split at the space and take the right side [LEFT/RIGHT], [Brain Region]
+        return value.split(" ")[1]  # Split at the space and take the right side [LEFT/RIGHT], [Brain Region]
 
+
+def get_region_ids(query_data, side_data):
+    id_nums = []
+    acronyms = query_data['acronym']
+    data_classes = side_data['Classification'].str.lower()
+    for brain_region in data_classes:
+        index = np.where(acronyms == brain_region)[0]
+        if len(index) == 0:
+            print(brain_region)
+        id_num = query_data['id'].iloc[index].values
+        id_nums.extend(id_num)
+
+    return id_nums
+
+
+def split_structure_id_path(path):
+    new_path = path[1:-1]  # remove leading and trailing slash
+    new_path = new_path.split('/')  # Separate by slashes
+
+    return new_path
 
 def main():
     #data_dir = get_folder()
