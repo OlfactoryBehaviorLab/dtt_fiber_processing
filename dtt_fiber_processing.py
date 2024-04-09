@@ -20,7 +20,7 @@ def get_folder(default_dir='R:') -> Path:
 def get_atlas_components() -> tuple[ReferenceSpaceCache, dict, dict]:
     # Modified from
     # https://allensdk.readthedocs.io/en/latest/_static/examples/nb/reference_space.html#Using-a-StructureTree
-    
+
     output_dir = Path('./ABA')
     output_dir.mkdir(exist_ok=True)
     reference_space_key = Path('annotation', 'ccf_2017')
@@ -52,18 +52,18 @@ def split_data(data: pd.DataFrame) -> tuple:
     right_data_index = []
     classification = data['Classification']
 
-
     for index, value in classification.items():
         if pd.isna(value):  # The total value lists NaN as its classification
-            left_data_index.append(index)
-            right_data_index.append(index)
+            # left_data_index.append(index)
+            # right_data_index.append(index)
+            continue
         elif 'Left' in value:  # If the class includes Left, put it in one bin, otherwise, its certainly a right
             left_data_index.append(index)
         else:
             right_data_index.append(index)
 
     left_data = data.iloc[left_data_index]  # Select only left regions
-    right_data = data.iloc[right_data_index] # Select only right regions
+    right_data = data.iloc[right_data_index]  # Select only right regions
 
     left_data['Classification'] = left_data['Classification'].apply(strip_sides)
     right_data['Classification'] = right_data['Classification'].apply(strip_sides)
@@ -73,7 +73,7 @@ def split_data(data: pd.DataFrame) -> tuple:
 
 def strip_sides(value):
     if pd.isna(value):
-        return 'Total_Brain'
+        return 'total'
     else:
         return value.split(" ")[1]  # Split at the space and take the right side [LEFT/RIGHT], [Brain Region]
 
@@ -81,11 +81,11 @@ def strip_sides(value):
 def get_region_ids(query_data, side_data):
     id_nums = []
     acronyms = query_data['acronym']
-    data_classes = side_data['Classification'].str.lower()
+    data_classes = side_data['Classification']
     for brain_region in data_classes:
         index = np.where(acronyms == brain_region)[0]
         if len(index) == 0:
-            print(brain_region)
+            continue
         id_num = query_data['id'].iloc[index].values
         id_nums.extend(id_num)
 
