@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+from allensdk.core.reference_space_cache import ReferenceSpaceCache
 from pathlib import Path
 from tkinter import filedialog
 from tqdm import tqdm
@@ -12,11 +12,28 @@ def get_folder(default_dir='R:') -> Path:
     if not default_dir.exists():
         default_dir = Path('C:')
 
-
     file_dialog = filedialog.askdirectory(title='Select QuPath Output Folder', initialdir=default_dir)
     file_path = Path(file_dialog)
     return file_path
 
+
+def get_atlas_components() -> tuple[ReferenceSpaceCache, dict, dict]:
+    # Modified from
+    # https://allensdk.readthedocs.io/en/latest/_static/examples/nb/reference_space.html#Using-a-StructureTree
+    
+    output_dir = Path('./ABA')
+    output_dir.mkdir(exist_ok=True)
+    reference_space_key = Path('annotation', 'ccf_2017')
+
+    resolution = 25
+    rspc = ReferenceSpaceCache(resolution, reference_space_key, manifest=output_dir.joinpath('manifest.json'))
+
+    # ID 1 is the adult mouse structure graph
+    tree = rspc.get_structure_tree(structure_graph_id=1)
+    id_map = tree.get_id_acronym_map()
+    structure_map = tree.get_ancestor_id_map()
+
+    return tree, id_map, structure_map
 
 def parse_datafile_paths(data_dir) -> tuple:
     query_file = []
