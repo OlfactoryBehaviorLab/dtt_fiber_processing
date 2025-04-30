@@ -34,6 +34,7 @@ classifiers = [
 dependencies = [
   'numpy',
   'pandas',
+  'openpyxl',
   'allensdk',
   'tqdm',
 ]
