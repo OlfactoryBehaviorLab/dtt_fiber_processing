@@ -112,25 +112,33 @@ def process_trace_data(data_file, ids_to_remove, tree, inv_id_map):
     combined_df = pd.concat([left_data, right_data], axis=0)
     return combined_df
 
-def get_region_ids(query_data, side_data):
-    id_nums = []
-    acronyms = query_data['acronym']
-    data_classes = side_data['Classification']
-    for brain_region in data_classes:
-        index = np.where(acronyms == brain_region)[0]
-        if len(index) == 0:
-            continue
-        id_num = query_data['id'].iloc[index].values
-        id_nums.extend(id_num)
 
-    return id_nums
+def save_file(data, output_dir, file_name):
+    output_file = output_dir.joinpath(file_name)
+    success = False
+    temp_counter = 0
 
+    while not success:
+        if temp_counter > MAX_RETRIES:
+            raise PermissionError(
+              f'Max number of retries met for saving {file_name}. Ensure the file is closed and the save location is available.'
+          )
 
-def split_structure_id_path(path):
-    new_path = path[1:-1]  # remove leading and trailing slash
-    new_path = new_path.split('/')  # Separate by slashes
+        if temp_counter > 0:
+            _temp_path = output_file.with_stem("_".join([output_file.stem, str(temp_counter)]))
+        else:
+            _temp_path = output_file
 
-    return new_path
+        try:
+            data.to_excel(_temp_path)
+        except PermissionError:
+            if temp_counter == 0:
+                print(f'\nError saving {output_file.name} using expected name, the file must be open. Using temporary name and retrying...')
+
+            temp_counter += 1
+        else:
+            success = True
+
 
 def main():
     #data_dir = get_folder()
