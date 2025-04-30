@@ -35,17 +35,10 @@ def get_atlas_components() -> tuple[ReferenceSpaceCache, dict, dict]:
 
     return tree, id_map, structure_map
 
-def parse_datafile_paths(data_dir) -> tuple:
-    query_file = []
-    data_dir_contents = list(data_dir.glob('*.csv')) # Get all CSV Files
+def parse_datafile_paths(data_dir) -> list:
+    data_dir_contents = list(data_dir.glob('*sum_data.xlsx')) # Get all CSV Files
+    return data_dir_contents
 
-    for file in data_dir_contents: # Find the query file, set it aside, and remove it from the list
-        if 'query' in file.stem:
-            query_file = file
-            data_dir_contents.remove(file)
-
-    return query_file, data_dir_contents
-    
 
 def split_data(data: pd.DataFrame) -> tuple:
     left_data_index = []
