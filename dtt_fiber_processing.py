@@ -40,28 +40,15 @@ def get_atlas_components() -> tuple[ReferenceSpaceCache, dict, dict]:
 
     return tree, id_map, structure_map
 
-def parse_datafile_paths(data_dir) -> list:
-    data_dir_contents = list(data_dir.glob('*sum_data.xlsx')) # Get all CSV Files
-    return data_dir_contents
-
 
 def split_data(data: pd.DataFrame) -> tuple:
-    left_data_index = []
-    right_data_index = []
     classification = data['Classification']
 
-    for index, value in classification.items():
-        if pd.isna(value):  # The total value lists NaN as its classification
-            # left_data_index.append(index)
-            # right_data_index.append(index)
-            continue
-        elif 'Left' in value:  # If the class includes Left, put it in one bin, otherwise, its certainly a right
-            left_data_index.append(index)
-        else:
-            right_data_index.append(index)
+    left_items_mask = classification.str.contains('Left')
+    right_items_mask = classification.str.contains('Right')
 
-    left_data = data.iloc[left_data_index]  # Select only left regions
-    right_data = data.iloc[right_data_index]  # Select only right regions
+    left_data = data.loc[left_items_mask]  # Select only left regions
+    right_data = data.loc[right_items_mask]  # Select only right regions
 
     left_data['Classification'] = left_data['Classification'].apply(strip_sides)
     right_data['Classification'] = right_data['Classification'].apply(strip_sides)
@@ -70,10 +57,7 @@ def split_data(data: pd.DataFrame) -> tuple:
 
 
 def strip_sides(value):
-    if pd.isna(value):
-        return 'total'
-    else:
-        return value.split(" ")[1]  # Split at the space and take the right side [LEFT/RIGHT], [Brain Region]
+    return value.split(" ")[1]  # Split at the space and take the right side [LEFT/RIGHT], [Brain Region]
 
 
 def get_region_ids(query_data, side_data):
