@@ -17,6 +17,11 @@ def get_folder(default_dir='R:') -> Path:
     return file_path
 
 
+def parse_datafile_paths(data_dir) -> list:
+    data_dir_contents = list(data_dir.glob('*sum_data.xlsx')) # Get all CSV Files
+    return data_dir_contents
+
+
 def get_atlas_components() -> tuple[ReferenceSpaceCache, dict, dict]:
     # Modified from
     # https://allensdk.readthedocs.io/en/latest/_static/examples/nb/reference_space.html#Using-a-StructureTree
