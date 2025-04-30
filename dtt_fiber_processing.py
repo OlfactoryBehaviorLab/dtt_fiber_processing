@@ -1,15 +1,14 @@
 import sys
-
-import pandas as pd
-from allensdk.core.reference_space_cache import ReferenceSpaceCache
 from pathlib import Path
 from tkinter import filedialog
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from allensdk.core import structure_tree
+import pandas as pd
 
+from allensdk.core.reference_space_cache import ReferenceSpaceCache
+from allensdk.core import structure_tree
 from tqdm.auto import tqdm
+
+
 
 pd.options.mode.chained_assignment = None
 pd.options.mode.copy_on_write = False
