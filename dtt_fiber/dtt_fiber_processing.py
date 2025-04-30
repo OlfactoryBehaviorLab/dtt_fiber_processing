@@ -27,7 +27,7 @@ def get_folder(default_dir='.', file_folder=None) -> Path:
 
     default_dir = Path(default_dir)
     if not default_dir.exists():
-        default_dir = Path('.')
+        default_dir = Path('..')
 
     file_dialog = filedialog.askdirectory(title='Select QuPath Output Folder', initialdir=default_dir)
     file_path = Path(file_dialog)
@@ -43,7 +43,7 @@ def get_atlas_components() -> tuple[structure_tree, dict, dict]:
     # Modified from
     # https://allensdk.readthedocs.io/en/latest/_static/examples/nb/reference_space.html#Using-a-StructureTree
 
-    output_dir = Path('./ABA')
+    output_dir = Path('../ABA')
     output_dir.mkdir(exist_ok=True)
     reference_space_key = Path('annotation', 'ccf_2017')
 
@@ -146,7 +146,7 @@ def main():
     elif sys.platform.startswith('linux'):
         default_dir = NIX_DEFAULT_PATH
     else:
-        default_dir = '.'
+        default_dir = '..'
 
     _data_dir = '/mnt/r2d2/3_Histology/QuPath Projects/Combined eGFP'
 
