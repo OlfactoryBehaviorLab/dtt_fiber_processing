@@ -19,9 +19,16 @@ NIX_DEFAULT_PATH = '/mnt/r2d2'
 
 MAX_RETRIES = 10
 
+def get_folder(default_dir='.', file_folder=None) -> Path:
 
+    if file_folder is not None:
+        file_folder = Path(file_folder)
+        if file_folder.exists():
+            return file_folder
+
+    default_dir = Path(default_dir)
     if not default_dir.exists():
-        default_dir = Path('C:')
+        default_dir = Path('.')
 
     file_dialog = filedialog.askdirectory(title='Select QuPath Output Folder', initialdir=default_dir)
     file_path = Path(file_dialog)
