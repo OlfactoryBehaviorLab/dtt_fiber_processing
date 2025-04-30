@@ -2,10 +2,9 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
-
 [project]
 name = "dtt_fiber"
-version = "0.1"
+version = "1.0"
 
 description = "Small package to process QuPath outputs for the dtt tracing project in the Dewan Lab"
 readme = "README.md"
