@@ -40,7 +40,7 @@ def parse_datafile_paths(data_dir) -> list:
     return data_dir_contents
 
 
-def get_atlas_components() -> tuple[ReferenceSpaceCache, dict, dict]:
+def get_atlas_components() -> tuple[structure_tree, dict, dict]:
     # Modified from
     # https://allensdk.readthedocs.io/en/latest/_static/examples/nb/reference_space.html#Using-a-StructureTree
 
