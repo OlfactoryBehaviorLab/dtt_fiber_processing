@@ -68,6 +68,9 @@ def split_data(data: pd.DataFrame) -> tuple:
     left_data = data.loc[left_items_mask]  # Select only left regions
     right_data = data.loc[right_items_mask]  # Select only right regions
 
+    left_data.insert(0, 'old_classification', left_data['Classification'])
+    right_data.insert(0, 'old_classification', right_data['Classification'])
+
     left_data['Classification'] = left_data['Classification'].apply(strip_sides)
     right_data['Classification'] = right_data['Classification'].apply(strip_sides)
 
@@ -75,8 +78,39 @@ def split_data(data: pd.DataFrame) -> tuple:
 
 
 def strip_sides(value):
-    return value.split(" ")[1]  # Split at the space and take the right side [LEFT/RIGHT], [Brain Region]
+    split_vals = value.split(" ")
+    if len(split_vals) > 2:
+        return " ".join(split_vals[1:])
+    return split_vals[1]  # Split at the space and take the right side [LEFT/RIGHT], [Brain Region]
 
+
+def _subtract_and_null_side(side_data, ids_to_remove, tree, inv_id_map):
+    for ID in ids_to_remove:
+        _tree = tree.parents(ID)[0] # Get tree for this ID
+        current_structure = _tree['acronym'] # Get the name of this region
+        parents = _tree["structure_id_path"][:-1] # The parents tree includes the current region
+        current_value = side_data.loc[current_structure]['Total_Value'] # Get the value to subtract
+        parent_names = [inv_id_map[key] for key in parents] # Get the name of each parent region
+        side_data.loc[parent_names, 'Total_Value'].sub(current_value)  # Subtract current region from every parent
+        descendants = tree.descendants(ID)[0] # Get all children for our current region, including itself
+        items_to_null = [item['acronym'] for item in descendants if item['acronym'] in side_data.index]  # Sometimes the descendants are not included in our sheet, remove any that are not
+        side_data.loc[items_to_null, 'Total_Value'] = 'NaN' # Null the current item and its children
+
+
+def process_trace_data(data_file, ids_to_remove, tree, inv_id_map):
+    data_file_df = pd.read_excel(data_file)
+    left_data, right_data = split_data(data_file_df)
+    left_data = left_data.set_index('Classification')
+    right_data = right_data.set_index('Classification')
+
+    _subtract_and_null_side(left_data, ids_to_remove, tree, inv_id_map)
+    _subtract_and_null_side(right_data, ids_to_remove, tree, inv_id_map)
+
+    left_data = left_data.set_index('old_classification', drop=True)
+    right_data = right_data.set_index('old_classification', drop=True)
+
+    combined_df = pd.concat([left_data, right_data], axis=0)
+    return combined_df
 
 def get_region_ids(query_data, side_data):
     id_nums = []
