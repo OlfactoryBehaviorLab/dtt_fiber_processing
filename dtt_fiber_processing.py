@@ -1,10 +1,13 @@
-import numpy as np
+import sys
+
 import pandas as pd
 from allensdk.core.reference_space_cache import ReferenceSpaceCache
 from pathlib import Path
 from tkinter import filedialog
-from tqdm import tqdm
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from allensdk.core import structure_tree
 
 def get_folder(default_dir='R:') -> Path:
     default_dir = Path(default_dir)
