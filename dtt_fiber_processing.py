@@ -9,8 +9,16 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from allensdk.core import structure_tree
 
-def get_folder(default_dir='R:') -> Path:
-    default_dir = Path(default_dir)
+from tqdm.auto import tqdm
+
+pd.options.mode.chained_assignment = None
+pd.options.mode.copy_on_write = False
+
+WINDOWS_DEFAULT_PATH = 'R:'
+NIX_DEFAULT_PATH = '/mnt/r2d2'
+
+MAX_RETRIES = 10
+
 
     if not default_dir.exists():
         default_dir = Path('C:')
