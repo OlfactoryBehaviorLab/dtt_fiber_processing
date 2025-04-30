@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "dtt_fiber"
+version = "0.1"
+
+description = "Small package to process QuPath outputs for the dtt tracing project in the Dewan Lab"
+readme = "README.md"
+requires-python = "<=3.11"
+license = { file = "LICENSE.txt" }
+keywords = ["sample", "setuptools", "development"]
+authors = [
+  { name = "Austin Pauley", email = "pauley@psy.fsu.edu" }
+]
+maintainers = [
+  { name = "Austin Pauley", email = "pauley@psy.fsu.edu" }
+]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Build Tools",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+dependencies = [
+  'numpy',
+  'pandas',
+  'allensdk',
+  'tqdm',
+]
+
+[project.optional-dependencies]
+dev = ["jupyter"]
+
+[project.urls]
+"Homepage" = "https://github.com/pypa/sampleproject"
+"Bug Reports" = "https://github.com/pypa/sampleproject/issues"
+"Funding" = "https://donate.pypi.org"
+"Say Thanks!" = "http://saythanks.io/to/example"
+"Source" = "https://github.com/pypa/sampleproject/"
+
+#[project.scripts]
+#sample = "sample:main"
+
+#[tool.setuptools]
+#package-data = { "sample" = ["*.dat"] }
