@@ -141,13 +141,31 @@ def save_file(data, output_dir, file_name):
 
 
 def main():
-    #data_dir = get_folder()
 
-    data_dir = Path('R:\\3_Histology\Qupath Projects\export measurements Test65')
-    query_file, data_files = parse_datafile_paths(data_dir)
-    data_file = data_files[0] # We're going to work with one file for now
+    if sys.platform.startswith('win32'):
+        default_dir = WINDOWS_DEFAULT_PATH
+    elif sys.platform.startswith('linux'):
+        default_dir = NIX_DEFAULT_PATH
+    else:
+        default_dir = '.'
 
-    data_file = pd.DataFrame(data_file)
+    _data_dir = '/mnt/r2d2/3_Histology/QuPath Projects/Combined eGFP'
+
+    data_dir = get_folder(default_dir, _data_dir)
+    data_files = parse_datafile_paths(data_dir)
+
+    output_dir = data_dir.joinpath('output')
+    output_dir.mkdir(exist_ok=True, parents=True)
+
+    input_file_path = data_dir.joinpath('input.xlsx')
+    ids_to_remove = pd.read_excel(input_file_path, header=None).values
+
+    tree, id_map, structure_map = get_atlas_components()
+    inv_id_map = {value: key for key, value in id_map.items()}
+
+    for file in tqdm(data_files):
+        processed_data = process_trace_data(file, ids_to_remove, tree, inv_id_map)
+        save_file(processed_data, output_dir, file.name)
 
 
 if __name__ == "__main__":
