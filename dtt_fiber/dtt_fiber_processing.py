@@ -151,6 +151,7 @@ def aggregate_data(all_processed_data: dict) -> pd.DataFrame:
 
     return aggregated_df
 
+
 def save_file(data, output_dir, file_name):
     output_file = output_dir.joinpath(file_name)
     success = False
