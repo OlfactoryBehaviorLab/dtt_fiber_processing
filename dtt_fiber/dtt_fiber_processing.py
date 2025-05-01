@@ -122,12 +122,19 @@ def process_trace_data(data_file, ids_to_remove, tree, inv_id_map):
     _subtract_and_null_side(left_data, ids_to_remove, tree, inv_id_map)
     _subtract_and_null_side(right_data, ids_to_remove, tree, inv_id_map)
 
+    left_root = left_data.loc['root']
+    right_root = right_data.loc['root']
+    total_root = left_root['Total_Value'] + right_root['Total_Value']
+
     left_data = left_data.rename(columns={'old_classification': 'Classification'})
     right_data = right_data.rename(columns={'old_classification': 'Classification'})
     left_data = left_data.set_index('Classification', drop=True)
     right_data = right_data.set_index('Classification', drop=True)
 
     combined_df = pd.concat([left_data, right_data], axis=0)
+    combined_df.loc[:, 'Percentage_of_Largest'] = (combined_df.loc[:, 'Total_Value'] * 100 / total_root).round(3)
+    total_row = pd.DataFrame([[total_root, 100]], index=['root'], columns=['Total_Value', 'Percentage_of_Largest'])
+    combined_df = pd.concat([combined_df, total_row], axis=0)
     return combined_df
 
 
