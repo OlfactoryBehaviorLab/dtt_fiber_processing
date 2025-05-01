@@ -110,7 +110,7 @@ def _subtract_and_null_side(side_data, ids_to_remove, tree, inv_id_map):
         side_data.loc[parent_names, 'Total_Value'].sub(current_value)  # Subtract current region from every parent
         descendants = tree.descendants(ID)[0] # Get all children for our current region, including itself
         items_to_null = [item['acronym'] for item in descendants if item['acronym'] in side_data.index]  # Sometimes the descendants are not included in our sheet, remove any that are not
-        side_data.loc[items_to_null, 'Total_Value'] = 'NaN' # Null the current item and its children
+        side_data.loc[items_to_null, ['Total_Value', 'Percentage_of_Largest']] = pd.NA # Null the current item and its children
 
 
 def process_trace_data(data_file, ids_to_remove, tree, inv_id_map):
@@ -130,6 +130,19 @@ def process_trace_data(data_file, ids_to_remove, tree, inv_id_map):
     combined_df = pd.concat([left_data, right_data], axis=0)
     return combined_df
 
+
+def aggregate_data(all_processed_data: dict) -> pd.DataFrame:
+    aggregated_df = pd.DataFrame()
+    for file_name, file_df in tqdm(all_processed_data.items(), desc='Aggregating Files...'):
+        file_df = file_df.fillna('D')
+        animal_name = file_name.split('_')[0]
+        new_cols = [f'{animal_name}_TV', f'{animal_name}_Perc']
+        file_df.columns = new_cols
+        aggregated_df = pd.concat([aggregated_df, file_df], axis=1)
+
+    aggregated_df = aggregated_df.fillna('X')
+
+    return aggregated_df
 
 def save_file(data, output_dir, file_name):
     output_file = output_dir.joinpath(file_name)
@@ -167,7 +180,6 @@ def main():
     else:
         default_dir = '..'
 
-    # _data_dir = '/mnt/r2d2/3_Histology/QuPath Projects/Combined eGFP'
     _data_dir = None
 
     data_dir = get_folder(default_dir, _data_dir)
@@ -182,15 +194,18 @@ def main():
     tree, id_map, structure_map = get_atlas_components()
     inv_id_map = {value: key for key, value in id_map.items()}
 
+    all_processed_data = {}
     for file in tqdm(data_files, desc='Preprocessing Files: '):
         processed_data = process_trace_data(file, ids_to_remove, tree, inv_id_map)
         save_file(processed_data, output_dir, file.name)
+        all_processed_data[file.stem] = processed_data
 
     print('Preprocessing Complete! Beginning data aggregation...')
 
+    aggregated_df = aggregate_data(all_processed_data)
+    save_file(aggregated_df, output_dir, 'aligned_eGFP_data.xlsx')
 
-
-
+    print('Data aggregation complete!')
 
 if __name__ == "__main__":
     main()
