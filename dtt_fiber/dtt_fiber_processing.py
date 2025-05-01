@@ -1,14 +1,19 @@
-import sys
+import os, sys
 from pathlib import Path
-from tkinter import filedialog
-
 import pandas as pd
 
 from allensdk.core.reference_space_cache import ReferenceSpaceCache
 from allensdk.core import structure_tree
 from tqdm.auto import tqdm
 
-
+try:
+    from PySide6.QtWidgets import QApplication, QFileDialog
+    import qdarktheme
+except ImportError:
+    print("GUI Components not found, folder selection dialog not available!")
+    os.environ['GUI'] = '0'
+else:
+    os.environ['GUI'] = '1'
 
 pd.options.mode.chained_assignment = None
 pd.options.mode.copy_on_write = False
@@ -29,8 +34,20 @@ def get_folder(default_dir='.', file_folder=None) -> Path:
     if not default_dir.exists():
         default_dir = Path('..')
 
-    file_dialog = filedialog.askdirectory(title='Select QuPath Output Folder', initialdir=default_dir)
-    file_path = Path(file_dialog)
+    if os.environ['GUI'] == '1':
+        app = QApplication(sys.argv)
+        qdarktheme.setup_theme()
+        file = QFileDialog.getExistingDirectory(None, "Open Directory", str(default_dir), QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontUseNativeDialog)
+        app.exit()
+
+        if len(file) == 0:
+            print('No directory selected. Using default directory.')
+            file = default_dir
+    else:
+        print('No directory provided and file selection not available. Using default directory.')
+        file = default_dir
+
+    file_path = Path(file)
     return file_path
 
 
@@ -148,7 +165,8 @@ def main():
     else:
         default_dir = '..'
 
-    _data_dir = '/mnt/r2d2/3_Histology/QuPath Projects/Combined eGFP'
+    # _data_dir = '/mnt/r2d2/3_Histology/QuPath Projects/Combined eGFP'
+    _data_dir = None
 
     data_dir = get_folder(default_dir, _data_dir)
     data_files = parse_datafile_paths(data_dir)

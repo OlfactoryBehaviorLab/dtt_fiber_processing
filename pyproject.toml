@@ -29,6 +29,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["jupyter"]
+gui = ["pyside6", "pyqtdarktheme"]
 
 [project.urls]
 "Homepage" = "https://github.com/pypa/sampleproject"
