@@ -116,14 +116,16 @@ def _subtract_and_null_side(side_data, ids_to_remove, tree, inv_id_map):
 def process_trace_data(data_file, ids_to_remove, tree, inv_id_map):
     data_file_df = pd.read_excel(data_file)
     left_data, right_data = split_data(data_file_df)
-    left_data = left_data.set_index('Classification')
-    right_data = right_data.set_index('Classification')
+    left_data = left_data.set_index('Classification', drop=True)
+    right_data = right_data.set_index('Classification', drop=True)
 
     _subtract_and_null_side(left_data, ids_to_remove, tree, inv_id_map)
     _subtract_and_null_side(right_data, ids_to_remove, tree, inv_id_map)
 
-    left_data = left_data.set_index('old_classification', drop=True)
-    right_data = right_data.set_index('old_classification', drop=True)
+    left_data = left_data.rename(columns={'old_classification': 'Classification'})
+    right_data = right_data.rename(columns={'old_classification': 'Classification'})
+    left_data = left_data.set_index('Classification', drop=True)
+    right_data = right_data.set_index('Classification', drop=True)
 
     combined_df = pd.concat([left_data, right_data], axis=0)
     return combined_df
@@ -180,9 +182,14 @@ def main():
     tree, id_map, structure_map = get_atlas_components()
     inv_id_map = {value: key for key, value in id_map.items()}
 
-    for file in tqdm(data_files):
+    for file in tqdm(data_files, desc='Preprocessing Files: '):
         processed_data = process_trace_data(file, ids_to_remove, tree, inv_id_map)
         save_file(processed_data, output_dir, file.name)
+
+    print('Preprocessing Complete! Beginning data aggregation...')
+
+
+
 
 
 if __name__ == "__main__":
