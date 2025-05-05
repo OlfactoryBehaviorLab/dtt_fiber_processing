@@ -39,8 +39,8 @@ gui = ["pyside6", "pyqtdarktheme"]
 "Say Thanks!" = "http://saythanks.io/to/example"
 "Source" = "https://github.com/pypa/sampleproject/"
 
-#[project.scripts]
-#sample = "sample:main"
+[project.scripts]
+dtt_fiber_processing = "dtt_fiber:main"
 
 [tool.setuptools]
 packages = ["dtt_fiber"]
