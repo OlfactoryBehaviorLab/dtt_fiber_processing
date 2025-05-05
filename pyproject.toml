@@ -24,7 +24,8 @@ dependencies = [
   'openpyxl',
   'allensdk',
   'tqdm',
-  'ruamel.yaml<0.18'
+  'ruamel.yaml<0.18',
+  'matplotlib>3.4.2'
 ]
 
 [project.optional-dependencies]
