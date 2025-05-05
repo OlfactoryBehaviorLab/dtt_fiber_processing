@@ -197,7 +197,11 @@ def main():
     output_dir.mkdir(exist_ok=True, parents=True)
 
     input_file_path = data_dir.joinpath('input.xlsx')
-    ids_to_remove = pd.read_excel(input_file_path, header=None).values
+    try:
+        ids_to_remove = pd.read_excel(input_file_path, header=None).values
+    except FileNotFoundError:
+        print(f'Error! Cannot find the input.xlsx file in {{{data_dir}}}')
+        return 0
 
     tree, id_map, structure_map = get_atlas_components()
     inv_id_map = {value: key for key, value in id_map.items()}
